@@ -19,22 +19,39 @@ const client = new MongoClient(uri, {
   }
 });
 
+
 async function run() {
   try {
     await client.connect();
+
+    const brandsCollection = client.db("brandsDB").collection("brands");
+
+    app.get("/brands", async (req, res) => {
+      const cursor = brandsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    app.post("/brands", async (req, res) => {
+      const newProduct = req.body;
+      console.log(newProduct);
+      const result = await brandsCollection.insertOne(newProduct);
+      res.send(result);
+    })
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
 
 
 app.get("/", (req, res) => {
-    res.send("Brand shop is running");
+  res.send("Brand shop is running");
 })
 
 app.listen(port, () => {
-    console.log(`Brand shop is running on port ${port}`);
+  console.log(`Brand shop is running on port ${port}`);
 })
