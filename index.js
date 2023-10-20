@@ -25,6 +25,8 @@ async function run() {
     await client.connect();
 
     const brandsCollection = client.db("brandsDB").collection("brands");
+    const brandNameCollection = client.db("brandsDB").collection("brandname");
+    const userCollection = client.db("brandsDB").collection("user");
 
     app.get("/brands", async (req, res) => {
       const cursor = brandsCollection.find();
@@ -36,6 +38,19 @@ async function run() {
       const newProduct = req.body;
       console.log(newProduct);
       const result = await brandsCollection.insertOne(newProduct);
+      res.send(result);
+    })
+
+    app.get("/user", async (req, res) => {
+      const cursor = userCollection.find();
+      const users = await cursor.toArray();
+      res.send(users);
+    })
+
+    app.post("/user", async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const result = await userCollection.insertOne(user);
       res.send(result);
     })
 
