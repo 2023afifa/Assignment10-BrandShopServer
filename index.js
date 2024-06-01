@@ -5,11 +5,12 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
+
 app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.BS_USER}:${process.env.BS_PASS}@cluster0.etbjr0z.mongodb.net/?retryWrites=true&w=majority`;
-console.log(uri);
+
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -21,11 +22,13 @@ const client = new MongoClient(uri, {
 
 
 async function run() {
+
   try {
+
     // await client.connect();
 
-
     const brandsCollection = client.db("brandsDB").collection("brands");
+    const brandsNameCollection = client.db("brandsDB").collection("brandsName");
     const cartCollection = client.db("brandsDB").collection("cart");
     const userCollection = client.db("brandsDB").collection("user");
 
@@ -41,7 +44,7 @@ async function run() {
       const query = { _id: new ObjectId(id) }
       const result = await brandsCollection.findOne(query);
       res.send(result);
-  })
+    })
 
     app.post("/brands", async (req, res) => {
       const newProduct = req.body;
@@ -55,6 +58,7 @@ async function run() {
       const filter = { _id: new ObjectId(id) }
       const options = { upsert: true }
       const updatedProduct = req.body;
+      console.log("Updated Product:", updatedProduct);
       const product = {
         $set: {
           name: updatedProduct.name,
@@ -68,6 +72,12 @@ async function run() {
       }
 
       const result = await brandsCollection.updateOne(filter, product, options);
+      res.send(result);
+    })
+
+    app.get("/brandsName", async (req, res) => {
+      const cursor = brandsNameCollection.find();
+      const result = await cursor.toArray();
       res.send(result);
     })
 
